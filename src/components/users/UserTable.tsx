@@ -6,9 +6,11 @@ import { Edit2, Trash2 } from 'lucide-react';
 interface UserTableProps {
   users: User[];
   isLoading: boolean;
+  onEdit: (user: User) => void;
+  onDelete: (user: User) => void;
 }
 
-const UserTable: React.FC<UserTableProps> = ({ users, isLoading }) => {
+const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDelete }) => {
   if (isLoading) {
     return (
       <div className="w-full h-64 flex items-center justify-center bg-white rounded-lg shadow-sm border border-slate-200">
@@ -98,10 +100,16 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading }) => {
                   </span>
                 </td>
                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                  <button className="text-indigo-600 hover:text-indigo-900 mr-4">
+                  <button 
+                    onClick={() => onEdit(user)}
+                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                  >
                     <Edit2 size={16} />
                   </button>
-                  <button className="text-red-600 hover:text-red-900">
+                  <button 
+                    onClick={() => onDelete(user)}
+                    className="text-red-600 hover:text-red-900"
+                  >
                     <Trash2 size={16} />
                   </button>
                 </td>

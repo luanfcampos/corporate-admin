@@ -1,8 +1,8 @@
 import type { User } from '../types';
 import { delay } from '../utils/delay';
 
-// Dados mockados estáticos para simulação
-const MOCK_USERS: User[] = [
+// Dados mockados mutáveis para simulação
+let MOCK_USERS: User[] = [
   {
     id: '1',
     name: 'Ana Silva',
@@ -53,7 +53,31 @@ const MOCK_USERS: User[] = [
 
 export const userService = {
   getUsers: async (): Promise<User[]> => {
-    await delay(800); // Simula delay de rede de 800ms
-    return MOCK_USERS;
+    await delay(800);
+    return [...MOCK_USERS]; // Retorna uma cópia para evitar mutação direta externa
+  },
+
+  createUser: async (user: Omit<User, 'id' | 'createdAt' | 'lastLogin'>): Promise<User> => {
+    await delay(800);
+    const newUser: User = {
+      ...user,
+      id: Math.random().toString(36).substr(2, 9),
+      createdAt: new Date().toISOString(),
+      lastLogin: new Date().toISOString(), // Simula login imediato ou nulo
+      avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=random`
+    };
+    MOCK_USERS = [newUser, ...MOCK_USERS];
+    return newUser;
+  },
+
+  updateUser: async (user: User): Promise<User> => {
+    await delay(800);
+    MOCK_USERS = MOCK_USERS.map(u => u.id === user.id ? user : u);
+    return user;
+  },
+
+  deleteUser: async (userId: string): Promise<void> => {
+    await delay(800);
+    MOCK_USERS = MOCK_USERS.filter(u => u.id !== userId);
   }
 };
