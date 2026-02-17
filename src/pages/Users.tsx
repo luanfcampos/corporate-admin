@@ -1,28 +1,50 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { userService } from '../services/userServices';
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
+import { userService } from '../services/UserServices';
 import UserTable from '../components/users/UserTable';
+import UserFilters from '../components/users/UserFilters';
+import Pagination from '../components/ui/Pagination';
 import Modal from '../components/ui/Modal';
 import UserForm from '../components/users/UserForm';
 import { Plus } from 'lucide-react';
-import type { User } from '../types';
+import type { User, UserStatus } from '../types';
+import { useDebounce } from '../hooks/useDebounce';
 
 const Users: React.FC = () => {
   const queryClient = useQueryClient();
   
+  // States para Filtros e Paginação
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(5); // Define 5 itens por página para facilitar teste
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState<UserStatus | 'ALL'>('ALL');
+  
+  // Debounce na busca para evitar requisições excessivas
+  const debouncedSearch = useDebounce(search, 500);
+
   // States para Modais
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  // Busca dados
-  const { data: users, isLoading, isError } = useQuery({
-    queryKey: ['users'],
-    queryFn: userService.getUsers,
+  // Busca dados com Paginação e Filtros
+  // A chave da query inclui as dependências para refetch automático
+  const { data: response, isLoading, isError, isPlaceholderData } = useQuery({
+    queryKey: ['users', page, pageSize, debouncedSearch, statusFilter],
+    queryFn: () => userService.getUsers(
+      { search: debouncedSearch, status: statusFilter },
+      { page, pageSize }
+    ),
+    placeholderData: keepPreviousData, // Mantém dados antigos enquanto carrega novos (UX melhor)
   });
 
-  // Mutations
+  // Resetar página quando mudar filtros
+  React.useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch, statusFilter]);
+
+  // Mutations (CRUD)
   const createMutation = useMutation({
     mutationFn: userService.createUser,
     onSuccess: () => {
@@ -109,13 +131,42 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Tabela de Listagem */}
-      <UserTable 
-        users={users || []} 
-        isLoading={isLoading} 
-        onEdit={handleEdit}
-        onDelete={handleDeleteClick}
+      {/* Filtros */}
+      <UserFilters 
+        searchTerm={search}
+        onSearchChange={setSearch}
+        statusFilter={statusFilter}
+        onStatusChange={setStatusFilter}
       />
+
+      {/* Tabela de Listagem */}
+      <div className="relative">
+        {/* Overlay de loading sutil ao trocar páginas/filtros */}
+        {isLoading && isPlaceholderData && (
+          <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
+             {/* Spinner opcional ou apenas opacidade */}
+          </div>
+        )}
+        
+        <UserTable 
+          users={response?.data || []} 
+          isLoading={isLoading && !isPlaceholderData} // Só mostra spinner no load inicial
+          onEdit={handleEdit}
+          onDelete={handleDeleteClick}
+        />
+      </div>
+
+      {/* Paginação */}
+      {response && (
+        <Pagination 
+          currentPage={page}
+          totalPages={response.totalPages}
+          totalItems={response.total}
+          pageSize={pageSize}
+          onPageChange={setPage}
+          disabled={isLoading || isPlaceholderData}
+        />
+      )}
 
       {/* Modal de Formulário (Criar/Editar) */}
       <Modal

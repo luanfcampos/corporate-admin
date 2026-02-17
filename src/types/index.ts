@@ -1,3 +1,4 @@
+
 export type UserRole = 'ADMIN' | 'MANAGER' | 'USER';
 export type UserStatus = 'ACTIVE' | 'INACTIVE' | 'PENDING';
 
@@ -14,12 +15,16 @@ export interface User {
 
 export interface UserFilters {
   search: string;
-  role?: UserRole | 'ALL';
   status?: UserStatus | 'ALL';
 }
 
-export interface PaginationState {
+export interface PaginationParams {
   page: number;
   pageSize: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
   total: number;
+  totalPages: number;
 }
