@@ -7,7 +7,8 @@ const MainLayout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-slate-50 overflow-hidden">
+    // ADICIONADO: dark:bg-slate-950 para garantir que o fundo escuro seja aplicado na estrutura principal
+    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden transition-colors duration-200">
       {/* Sidebar Navigation */}
       <Sidebar 
         isOpen={isSidebarOpen} 

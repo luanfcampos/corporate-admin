@@ -6,36 +6,38 @@ Este projeto simula um cenário real de aplicação corporativa, cobrindo **CRUD
 
 ---
 
-## 🎯 Objetivo do Projeto
-
-Demonstrar domínio em:
-
-- Arquitetura Front-end escalável
+## 🔹 O que este projeto utiliza
 - Componentização reutilizável
 - Gerenciamento de estado assíncrono
-- UX em aplicações administrativas
-- Código limpo, tipado e organizado
+- CRUD completo
+- Tabelas com filtros e paginação
+- Estados de loading, erro e vazio
+- Código limpo e tipado
 
 Projeto desenvolvido **exclusivamente no Front-end**, utilizando **dados mockados**, simulando uma API real.
 
 ---
 
-## 🧩 Funcionalidades
-
-- 📊 Dashboard inicial com métricas simuladas
-- 👥 Listagem de usuários em tabela
-- ➕ Criação de usuários
-- ✏️ Edição de usuários
-- 🗑️ Remoção de usuários
-- 🔍 Filtros por nome, email e status
-- 📄 Paginação
-- ⏳ Estados de loading, erro e vazio
-- 📱 Layout responsivo
-- ♿ Acessibilidade básica
+## 🔹 Principais tecnologias
+- React
+- TypeScript
+- Tailwind CSS
+- React Router
+- React Query
+- Vite
 
 ---
 
-## 🧪 Dados
+## 🔹 Funcionalidades
+- Listagem de usuários
+- Criar, editar e remover usuários
+- Filtros e paginação
+- Layout responsivo
+- Acessibilidade básica
+
+---
+
+## 🔹 Dados
 
 - Dados mockados (sem backend real)
 - Simulação de requisições com **React Query**
@@ -43,7 +45,7 @@ Projeto desenvolvido **exclusivamente no Front-end**, utilizando **dados mockado
 
 ---
 
-## 🧱 Arquitetura de Pastas
+## 🔹 Arquitetura de Pastas
 
 ```bash
 src/
@@ -54,3 +56,10 @@ src/
 ├── types/        # Tipagens TypeScript
 ├── utils/        # Funções utilitárias
 └── styles/       # Estilos globais (se necessário)
+``` 
+---
+
+## ▶️ Como rodar
+```bash
+npm install
+npm run dev

@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@variant dark (&:is(.dark, .dark *));
+
+@layer base {
+  body {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+/* 
+  Transições globais para o tema Dark/Light.
+  Aplicado diretaxmente aqui para evitar repetição excessiva de classes utilitárias no HTML.
+*/
+body, div, nav, header, aside, section, article, table, tr, td, th {
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+@layer utilities {
+  .bg-slate-850 {
+    background-color: #172033;
+  }
+  .bg-slate-950 {
+    background-color: #020617;
+  }
+}
