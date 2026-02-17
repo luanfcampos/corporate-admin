@@ -27,6 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         <div 
           className="fixed inset-0 bg-black/50 z-20 md:hidden"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
 
@@ -34,7 +35,11 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Logo Area */}
         <div className="flex items-center justify-between h-16 px-6 bg-slate-950">
           <span className="text-xl font-bold tracking-wider text-indigo-400">AdminCorp</span>
-          <button onClick={onClose} className="md:hidden text-slate-400 hover:text-white">
+          <button 
+            onClick={onClose} 
+            className="md:hidden text-slate-400 hover:text-white"
+            aria-label="Fechar menu"
+          >
             <X size={24} />
           </button>
         </div>
@@ -53,7 +58,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   : 'text-slate-400 hover:bg-slate-800 hover:text-white'}
               `}
             >
-              <item.icon size={20} />
+              <item.icon size={20} aria-hidden="true" />
               {item.label}
             </NavLink>
           ))}
@@ -62,7 +67,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         {/* Footer Sidebar */}
         <div className="p-4 border-t border-slate-800">
           <div className="flex items-center gap-3 px-4 py-2">
-            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold">
+            <div className="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-xs font-bold" aria-hidden="true">
               AD
             </div>
             <div className="flex-1 overflow-hidden">

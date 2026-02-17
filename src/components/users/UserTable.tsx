@@ -144,13 +144,17 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDelet
                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                   <button 
                     onClick={() => onEdit(user)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4 transition-colors"
+                    className="text-indigo-600 hover:text-indigo-900 mr-4 transition-colors p-1 rounded hover:bg-indigo-50"
+                    aria-label={`Editar usuário ${user.name}`}
+                    title="Editar"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button 
                     onClick={() => onDelete(user)}
-                    className="text-red-600 hover:text-red-900 transition-colors"
+                    className="text-red-600 hover:text-red-900 transition-colors p-1 rounded hover:bg-red-50"
+                    aria-label={`Excluir usuário ${user.name}`}
+                    title="Excluir"
                   >
                     <Trash2 size={16} />
                   </button>

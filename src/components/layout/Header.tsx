@@ -12,6 +12,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
         <button 
           onClick={onMenuClick}
           className="p-2 -ml-2 text-slate-600 hover:bg-slate-100 rounded-md md:hidden"
+          aria-label="Abrir menu principal"
         >
           <Menu size={24} />
         </button>
@@ -21,7 +22,10 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
       </div>
 
       <div className="flex items-center gap-4">
-        <button className="p-2 text-slate-400 hover:text-indigo-600 transition-colors relative">
+        <button 
+          className="p-2 text-slate-400 hover:text-indigo-600 transition-colors relative"
+          aria-label="Notificações"
+        >
           <Bell size={20} />
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
         </button>

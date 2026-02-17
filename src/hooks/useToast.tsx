@@ -25,7 +25,8 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   }, []);
 
   const addToast = useCallback((message: string, type: ToastType) => {
-    const id = Math.random().toString(36).substr(2, 9);
+    // Uso de substring ao invés de substr (deprecated)
+    const id = Math.random().toString(36).substring(2, 9);
     const toast = { id, message, type };
     setToasts((state) => [...state, toast]);
 
@@ -50,12 +51,13 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
               toast.type === 'error' && "border-l-4 border-red-500",
               toast.type === 'info' && "border-l-4 border-blue-500"
             )}
+            role="alert"
           >
             <div className="p-4 flex items-start">
               <div className="flex-shrink-0">
-                {toast.type === 'success' && <CheckCircle className="h-5 w-5 text-green-400" />}
-                {toast.type === 'error' && <AlertCircle className="h-5 w-5 text-red-400" />}
-                {toast.type === 'info' && <Info className="h-5 w-5 text-blue-400" />}
+                {toast.type === 'success' && <CheckCircle className="h-5 w-5 text-green-400" aria-hidden="true" />}
+                {toast.type === 'error' && <AlertCircle className="h-5 w-5 text-red-400" aria-hidden="true" />}
+                {toast.type === 'info' && <Info className="h-5 w-5 text-blue-400" aria-hidden="true" />}
               </div>
               <div className="ml-3 w-0 flex-1 pt-0.5">
                 <p className="text-sm font-medium text-gray-900">{toast.message}</p>
@@ -65,6 +67,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
                   type="button"
                   className="inline-flex rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
                   onClick={() => removeToast(toast.id)}
+                  aria-label="Fechar notificação"
                 >
                   <X className="h-5 w-5" />
                 </button>
