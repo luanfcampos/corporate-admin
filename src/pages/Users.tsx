@@ -124,8 +124,10 @@ const Users: React.FC = () => {
     <div className="space-y-6">
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Usuários</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          {/* ✅ CORRIGIDO: Adicionado dark:text-white */}
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Usuários</h1>
+          {/* ✅ CORRIGIDO: Adicionado dark:text-slate-400 */}
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Gerencie os membros da sua organização, suas funções e status.
           </p>
         </div>
@@ -153,10 +155,9 @@ const Users: React.FC = () => {
       ) : (
         <>
           <div className="relative">
-            {/* O Skeleton agora está dentro do UserTable, sendo exibido quando isLoading=true e não há placeholderData */}
-            {/* Quando há placeholderData, a tabela antiga continua visível, então isLoading visual é tratado com opacidade ou sutil */}
+            {/* ✅ CORRIGIDO: Adicionado dark:bg-slate-900/50 */}
             {isLoading && isPlaceholderData && (
-              <div className="absolute inset-0 bg-white/50 z-10 transition-opacity" />
+              <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 z-10 transition-opacity" />
             )}
             
             <UserTable 
@@ -202,8 +203,13 @@ const Users: React.FC = () => {
         maxWidth="sm"
       >
         <div className="mt-2">
-          <p className="text-sm text-gray-500">
-            Tem certeza que deseja remover o usuário <span className="font-bold text-gray-700">{userToDelete?.name}</span>? Esta ação não pode ser desfeita.
+          {/* ✅ CORRIGIDO: Adicionado dark:text-gray-400 e dark:text-gray-300 */}
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Tem certeza que deseja remover o usuário{' '}
+            <span className="font-bold text-gray-700 dark:text-gray-300">
+              {userToDelete?.name}
+            </span>
+            ? Esta ação não pode ser desfeita.
           </p>
         </div>
         <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
@@ -215,9 +221,10 @@ const Users: React.FC = () => {
           >
             {deleteMutation.isPending ? 'Excluindo...' : 'Excluir'}
           </button>
+          {/* ✅ CORRIGIDO: Adicionado dark:bg-slate-800, dark:text-white, dark:ring-slate-600, dark:hover:bg-slate-700 */}
           <button
             type="button"
-            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0 transition-colors"
+            className="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-slate-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-white shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-slate-600 hover:bg-gray-50 dark:hover:bg-slate-700 sm:col-start-1 sm:mt-0 transition-colors"
             onClick={() => setIsDeleteOpen(false)}
           >
             Cancelar
