@@ -1,7 +1,9 @@
 import React from 'react';
 import type { User } from '../../types';
 import Badge from '../ui/Badge';
-import { Edit2, Trash2 } from 'lucide-react';
+import { Edit2, Trash2, SearchX } from 'lucide-react';
+import Skeleton from '../ui/Skeleton';
+import EmptyState from '../ui/EmptyState';
 
 interface UserTableProps {
   users: User[];
@@ -11,19 +13,59 @@ interface UserTableProps {
 }
 
 const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDelete }) => {
+  // Skeleton Loading State
   if (isLoading) {
     return (
-      <div className="w-full h-64 flex items-center justify-center bg-white rounded-lg shadow-sm border border-slate-200">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="py-3.5 pl-4 pr-3 text-left sm:pl-6"><Skeleton className="h-4 w-20" /></th>
+                <th className="px-3 py-3.5"><Skeleton className="h-4 w-16" /></th>
+                <th className="px-3 py-3.5"><Skeleton className="h-4 w-16" /></th>
+                <th className="px-3 py-3.5"><Skeleton className="h-4 w-24" /></th>
+                <th className="relative py-3.5 pl-3 pr-4 sm:pr-6"><span className="sr-only">Ações</span></th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200 bg-white">
+              {[...Array(5)].map((_, i) => (
+                <tr key={i}>
+                  <td className="whitespace-nowrap py-4 pl-4 pr-3 sm:pl-6">
+                    <div className="flex items-center">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="ml-4 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-3 py-4"><Skeleton className="h-5 w-16 rounded-full" /></td>
+                  <td className="whitespace-nowrap px-3 py-4"><Skeleton className="h-5 w-20 rounded-full" /></td>
+                  <td className="whitespace-nowrap px-3 py-4"><Skeleton className="h-4 w-32" /></td>
+                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right sm:pr-6">
+                    <div className="flex justify-end gap-2">
+                      <Skeleton className="h-5 w-5" />
+                      <Skeleton className="h-5 w-5" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     );
   }
 
+  // Empty State
   if (users.length === 0) {
     return (
-      <div className="text-center py-12 bg-white rounded-lg border border-slate-200">
-        <p className="text-slate-500">Nenhum usuário encontrado.</p>
-      </div>
+      <EmptyState 
+        icon={SearchX}
+        title="Nenhum usuário encontrado"
+        description="Não encontramos registros com os filtros atuais. Tente buscar outro termo ou limpar os filtros."
+      />
     );
   }
 
@@ -41,7 +83,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDelet
   };
 
   return (
-    <div className="overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg">
+    <div className="overflow-hidden bg-white shadow-sm ring-1 ring-gray-900/5 sm:rounded-lg transition-all">
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
@@ -102,13 +144,13 @@ const UserTable: React.FC<UserTableProps> = ({ users, isLoading, onEdit, onDelet
                 <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                   <button 
                     onClick={() => onEdit(user)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-4"
+                    className="text-indigo-600 hover:text-indigo-900 mr-4 transition-colors"
                   >
                     <Edit2 size={16} />
                   </button>
                   <button 
                     onClick={() => onDelete(user)}
-                    className="text-red-600 hover:text-red-900"
+                    className="text-red-600 hover:text-red-900 transition-colors"
                   >
                     <Trash2 size={16} />
                   </button>

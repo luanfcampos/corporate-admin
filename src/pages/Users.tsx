@@ -1,25 +1,27 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from '@tanstack/react-query';
-import { userService } from '../services/UserServices';
+import { userService } from '../services/userServices';
 import UserTable from '../components/users/UserTable';
 import UserFilters from '../components/users/UserFilters';
 import Pagination from '../components/ui/Pagination';
 import Modal from '../components/ui/Modal';
 import UserForm from '../components/users/UserForm';
+import ErrorState from '../components/ui/ErrorState';
 import { Plus } from 'lucide-react';
 import type { User, UserStatus } from '../types';
 import { useDebounce } from '../hooks/useDebounce';
+import { useToast } from '../hooks/useToast';
 
 const Users: React.FC = () => {
   const queryClient = useQueryClient();
+  const { addToast } = useToast();
   
   // States para Filtros e Paginação
   const [page, setPage] = useState(1);
-  const [pageSize] = useState(5); // Define 5 itens por página para facilitar teste
+  const [pageSize] = useState(5);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<UserStatus | 'ALL'>('ALL');
   
-  // Debounce na busca para evitar requisições excessivas
   const debouncedSearch = useDebounce(search, 500);
 
   // States para Modais
@@ -28,15 +30,20 @@ const Users: React.FC = () => {
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [userToDelete, setUserToDelete] = useState<User | null>(null);
 
-  // Busca dados com Paginação e Filtros
-  // A chave da query inclui as dependências para refetch automático
-  const { data: response, isLoading, isError, isPlaceholderData } = useQuery({
+  // Busca dados
+  const { 
+    data: response, 
+    isLoading, 
+    isError, 
+    isPlaceholderData, 
+    refetch 
+  } = useQuery({
     queryKey: ['users', page, pageSize, debouncedSearch, statusFilter],
     queryFn: () => userService.getUsers(
       { search: debouncedSearch, status: statusFilter },
       { page, pageSize }
     ),
-    placeholderData: keepPreviousData, // Mantém dados antigos enquanto carrega novos (UX melhor)
+    placeholderData: keepPreviousData,
   });
 
   // Resetar página quando mudar filtros
@@ -44,13 +51,17 @@ const Users: React.FC = () => {
     setPage(1);
   }, [debouncedSearch, statusFilter]);
 
-  // Mutations (CRUD)
+  // Mutations
   const createMutation = useMutation({
     mutationFn: userService.createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsFormOpen(false);
+      addToast('Usuário criado com sucesso!', 'success');
     },
+    onError: () => {
+      addToast('Erro ao criar usuário.', 'error');
+    }
   });
 
   const updateMutation = useMutation({
@@ -59,7 +70,11 @@ const Users: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsFormOpen(false);
       setEditingUser(null);
+      addToast('Usuário atualizado com sucesso!', 'success');
     },
+    onError: () => {
+      addToast('Erro ao atualizar usuário.', 'error');
+    }
   });
 
   const deleteMutation = useMutation({
@@ -68,7 +83,11 @@ const Users: React.FC = () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
       setIsDeleteOpen(false);
       setUserToDelete(null);
+      addToast('Usuário removido com sucesso!', 'success');
     },
+    onError: () => {
+      addToast('Erro ao remover usuário.', 'error');
+    }
   });
 
   // Handlers
@@ -101,17 +120,8 @@ const Users: React.FC = () => {
     }
   };
 
-  if (isError) {
-    return (
-      <div className="p-8 text-center text-red-500">
-        Erro ao carregar usuários. Tente novamente mais tarde.
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Header da Página */}
       <div className="sm:flex sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Usuários</h1>
@@ -123,7 +133,7 @@ const Users: React.FC = () => {
           <button
             type="button"
             onClick={handleCreate}
-            className="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            className="flex items-center gap-2 rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-colors"
           >
             <Plus size={16} />
             Novo Usuário
@@ -131,7 +141,6 @@ const Users: React.FC = () => {
         </div>
       </div>
 
-      {/* Filtros */}
       <UserFilters 
         searchTerm={search}
         onSearchChange={setSearch}
@@ -139,33 +148,36 @@ const Users: React.FC = () => {
         onStatusChange={setStatusFilter}
       />
 
-      {/* Tabela de Listagem */}
-      <div className="relative">
-        {/* Overlay de loading sutil ao trocar páginas/filtros */}
-        {isLoading && isPlaceholderData && (
-          <div className="absolute inset-0 bg-white/50 z-10 flex items-center justify-center">
-             {/* Spinner opcional ou apenas opacidade */}
+      {isError ? (
+        <ErrorState onRetry={() => refetch()} />
+      ) : (
+        <>
+          <div className="relative">
+            {/* O Skeleton agora está dentro do UserTable, sendo exibido quando isLoading=true e não há placeholderData */}
+            {/* Quando há placeholderData, a tabela antiga continua visível, então isLoading visual é tratado com opacidade ou sutil */}
+            {isLoading && isPlaceholderData && (
+              <div className="absolute inset-0 bg-white/50 z-10 transition-opacity" />
+            )}
+            
+            <UserTable 
+              users={response?.data || []} 
+              isLoading={isLoading && !isPlaceholderData}
+              onEdit={handleEdit}
+              onDelete={handleDeleteClick}
+            />
           </div>
-        )}
-        
-        <UserTable 
-          users={response?.data || []} 
-          isLoading={isLoading && !isPlaceholderData} // Só mostra spinner no load inicial
-          onEdit={handleEdit}
-          onDelete={handleDeleteClick}
-        />
-      </div>
 
-      {/* Paginação */}
-      {response && (
-        <Pagination 
-          currentPage={page}
-          totalPages={response.totalPages}
-          totalItems={response.total}
-          pageSize={pageSize}
-          onPageChange={setPage}
-          disabled={isLoading || isPlaceholderData}
-        />
+          {response && (
+            <Pagination 
+              currentPage={page}
+              totalPages={response.totalPages}
+              totalItems={response.total}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              disabled={isLoading || isPlaceholderData}
+            />
+          )}
+        </>
       )}
 
       {/* Modal de Formulário (Criar/Editar) */}
@@ -197,7 +209,7 @@ const Users: React.FC = () => {
         <div className="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3">
           <button
             type="button"
-            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:col-start-2"
+            className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 sm:col-start-2 transition-colors disabled:opacity-70"
             onClick={handleConfirmDelete}
             disabled={deleteMutation.isPending}
           >
@@ -205,7 +217,7 @@ const Users: React.FC = () => {
           </button>
           <button
             type="button"
-            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0"
+            className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:col-start-1 sm:mt-0 transition-colors"
             onClick={() => setIsDeleteOpen(false)}
           >
             Cancelar
