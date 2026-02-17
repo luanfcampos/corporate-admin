@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, Settings, X } from 'lucide-react';
+import { LayoutDashboard, Users, Settings, X , Command} from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -34,7 +34,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <aside className={sidebarClasses}>
         {/* Logo Area */}
         <div className="flex items-center justify-between h-16 px-6 bg-slate-950">
-          <span className="text-xl font-bold tracking-wider text-indigo-400">AdminCorp</span>
+          <div className='flex gap-2 items-center'>
+            <Command color="#7c86ff" />
+            <span className="text-xl font-bold tracking-wider text-indigo-400">AdminCorp</span>
+          </div>
           <button 
             onClick={onClose} 
             className="md:hidden text-slate-400 hover:text-white"
